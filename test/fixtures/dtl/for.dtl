@@ -1,0 +1,3 @@
+{% for key, items_i in items %}
+  <a href="{{ items_i.foobar }}">link</a>
+{% endfor %}

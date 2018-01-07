@@ -1,0 +1,8 @@
+{% if foo %}
+  Foo
+{% else %}
+  {% if bar %}
+    Bar
+  {% endif %}
+  Baz
+{% endif %}
