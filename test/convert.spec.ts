@@ -8,6 +8,8 @@ describe('convert', () => {
   describe('from hbs to dtl', () => {
     // prettier-ignore
     const tests = [
+      'nested-for-conditional',
+      'nested-for-data',
       'comment',
       'variable',
       'raw',

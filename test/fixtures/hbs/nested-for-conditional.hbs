@@ -1,0 +1,17 @@
+{{#each users }}
+  {{#if foo }}
+
+    {{#each comments }}
+
+      {{#if title}}
+        <a href="{{ id }}">{{ name }}</a>
+      {{/if}}
+
+    {{/each}}
+
+  {{else}}
+    {{#each comments }}
+      {{id}}
+    {{/each}}
+  {{/if}}
+{{/each}}

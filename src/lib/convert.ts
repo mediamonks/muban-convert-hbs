@@ -46,7 +46,8 @@ class Transpiler {
             variable = 'forloop.counter0';
           } else if (path.original === '@key') {
             // TODO: support "@../key"
-            variable = 'key';
+            // variable = 'key';
+            variable = 'forloop.counter0';
           } else {
             const scoped = scope ? `${scope}.` : '';
             variable = scoped + path.parts.join('.');
@@ -102,12 +103,14 @@ class Transpiler {
               if (statement.program.blockParams) {
                 // {{#each foo as |key, value|}
                 const blockParams = statement.program.blockParams;
-                this.buffer.push(`{% for ${blockParams[1]}, ${blockParams[0]} in ${condition} %}`);
+                this.buffer.push(
+                  `{% for ${blockParams[1]}, ${blockParams[0]} in ${condition}.items %}`,
+                );
               } else {
                 // {{#each foo}}
                 scope = `${condition}_i`;
                 // TODO: detect 'key' in child programs, can be tricky with nested blocks that might reference using @../key
-                this.buffer.push(`{% for key, ${scope} in ${condition} %}`);
+                this.buffer.push(`{% for ${scope} in ${condition} %}`);
               }
               this.buffer.push(new Transpiler().parseProgram(statement.program, scope).toString());
               this.buffer.push(`{% endfor %}`);

@@ -1,0 +1,17 @@
+{% for users_i in users %}
+  {% if users_i.foo %}
+
+    {% for comments_i in comments %}
+
+      {% if comments_i.title %}
+        <a href="{{ comments_i.id }}">{{ comments_i.name }}</a>
+      {% endif %}
+
+    {% endfor %}
+
+  {% else %}
+    {% for comments_i in comments %}
+      {{ comments_i.id }}
+    {% endfor %}
+  {% endif %}
+{% endfor %}
