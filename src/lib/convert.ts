@@ -7,50 +7,67 @@ const convert = input => {
   return output;
 };
 
-class Contexts {
-  private _contexts: any[];
+enum ScopeType {
+  EachHash,
+  EachArray,
+  EachArrayWithParams,
+  EachHashWithParams,
+}
 
-  constructor() {
-    this._contexts = [];
-  }
+class Scope {
+  public variables: string[];
+  public type: ScopeType;
 
-  push(s) {
-    this._contexts.push(s);
-  }
-
-  getScope(depth) {
-    return this._contexts[depth - 1];
-  }
-
-  getScopedVariable(depth, varName) {
-    const sc = this.getScope(depth);
-    if (typeof sc === 'undefined') {
-      return varName;
-    }
-    // if context has 2 variables as in {each foo |k, v|}
-    // we dont have to bind variables
-    // as user will use {{v.attribute}} etc.
-    if (sc.length === 2) return varName;
-
-    return [sc, varName].join('.');
+  constructor(variables: string[], type: ScopeType) {
+    this.variables = variables;
+    this.type = type;
   }
 }
 
-const assertType = (cond: any, type: string) => {
-  if (typeof cond !== type) {
-    throw new Error('should be ' + type + ' :' + typeof cond);
+class Scopes {
+  private scopes: Scope[];
+
+  constructor() {
+    this.scopes = [];
   }
-};
+
+  push(variables: string[], scopeType: ScopeType) {
+    this.scopes.push(new Scope(variables, scopeType));
+  }
+
+  getScope(depth) {
+    return this.scopes[depth - 1];
+  }
+
+  getScopedVariable(depth: number, varName: string) {
+    if (depth - 1 < 0)
+      // upper level is root
+      return varName;
+
+    const scope = this.getScope(depth);
+    const vars = varName.split('.');
+
+    if (vars.length === 2) {
+      return varName;
+    }
+
+    if (scope.variables.includes(varName)) {
+      return varName;
+    }
+
+    return [scope.variables[0], varName].join('.');
+  }
+}
 
 class Transpiler {
   private buffer: any[];
   private parsed: hbs.AST.Program;
-  private contexts: Contexts;
+  private scopes: Scopes;
   private depth: number;
 
-  constructor(input?, contexts?, depth = 0) {
+  constructor(input?, scopes?, depth = 0) {
     this.buffer = [];
-    this.contexts = contexts || new Contexts();
+    this.scopes = scopes || new Scopes();
     this.depth = depth;
 
     if (input) {
@@ -62,8 +79,6 @@ class Transpiler {
   parseProgram(program: hbs.AST.Program, isConditionalInInverse: boolean = false) {
     // console.log('\n\n -- PROGRAM -- \n');
     // console.log(program);
-    assertType(isConditionalInInverse, 'boolean');
-
     program.body.forEach((statement: hbs.AST.ProgramStatement) => {
       switch (statement.type) {
         case 'ContentStatement':
@@ -73,14 +88,12 @@ class Transpiler {
         case 'MustacheStatement':
           // console.log('\n\nMustacheStatement\n');
           // console.log(statement);
-          const scope = this.contexts.getScope(this.depth);
-
           const path = <hbs.AST.PathExpression>statement.path;
           const escaped = statement.escaped ? '' : '|safe';
 
           let variable;
           if (path.original === 'this') {
-            variable = scope;
+            variable = this.scopes.getScope(this.depth).variables[0];
           } else if (path.original === '@index') {
             variable = 'forloop.counter0';
           } else if (path.original === '@key') {
@@ -88,7 +101,7 @@ class Transpiler {
             // variable = 'key';
             variable = 'forloop.counter0';
           } else {
-            variable = this.contexts.getScopedVariable(this.depth, path.parts.join('.'));
+            variable = this.scopes.getScopedVariable(this.depth, path.parts.join('.'));
           }
 
           if (path.type === 'PathExpression') {
@@ -110,17 +123,17 @@ class Transpiler {
           switch (type) {
             case 'if': {
               const condition = statement.params.map(createPath).join(' ');
-              const scopedCondition = this.contexts.getScopedVariable(this.depth, condition);
+              const scopedCondition = this.scopes.getScopedVariable(this.depth, condition);
 
               // use `else if` instead of else when this is the only if statement in an else block
               this.buffer.push(`{% ${isConditionalInInverse ? 'el' : ''}if ${scopedCondition} %}`);
-              const t = new Transpiler(null, this.contexts, this.depth);
+              const t = new Transpiler(null, this.scopes, this.depth);
               this.buffer.push(t.parseProgram(statement.program).toString());
 
               if (statement.inverse) {
                 // else section
                 const isInverseOnlyConditional = Transpiler.isOnlyCondition(statement.inverse);
-                const t = new Transpiler(null, this.contexts, this.depth);
+                const t = new Transpiler(null, this.scopes, this.depth);
                 t.parseProgram(statement.inverse, isInverseOnlyConditional);
 
                 // child will render a `else if`
@@ -138,25 +151,37 @@ class Transpiler {
             }
 
             case 'each': {
-              const condition = statement.params.map(createPath).join(' ');
+              let condition = statement.params.map(createPath).join(' ');
               let scope = '';
 
               if (statement.program.blockParams) {
                 // {{#each foo as |key, value|}
                 const blockParams = statement.program.blockParams;
                 // {{#each foo as |k, v|} => has 2 variable in the same context, k and v
-                this.contexts.push([blockParams[0], blockParams[1]]);
-                this.buffer.push(
-                  `{% for ${blockParams[1]}, ${blockParams[0]} in ${condition}.items %}`,
-                );
+                if (blockParams.length === 1) {
+                  this.scopes.push(blockParams, ScopeType.EachArrayWithParams);
+
+                  if (condition.indexOf('.') < 0) {
+                    condition = this.scopes.getScopedVariable(this.depth, condition);
+                  }
+
+                  this.buffer.push(`{% for ${blockParams[0]} in ${condition} %}`);
+                } else if (blockParams.length === 2) {
+                  this.scopes.push(blockParams, ScopeType.EachHashWithParams);
+                  this.buffer.push(
+                    `{% for ${blockParams[1]}, ${blockParams[0]} in ${condition}.items %}`,
+                  );
+                } else {
+                  throw new Error("We don't support more than 2 scope variables ");
+                }
               } else {
                 // {{#each foo}}
                 scope = `${condition}_i`;
-                this.contexts.push(scope);
+                this.scopes.push([scope], ScopeType.EachArray);
                 // TODO: detect 'key' in child programs, can be tricky with nested blocks that might reference using @../key
                 this.buffer.push(`{% for ${scope} in ${condition} %}`);
               }
-              const t = new Transpiler(null, this.contexts, this.depth + 1);
+              const t = new Transpiler(null, this.scopes, this.depth + 1);
               this.buffer.push(t.parseProgram(statement.program).toString());
               this.buffer.push(`{% endfor %}`);
               break;

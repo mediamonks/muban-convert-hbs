@@ -1,0 +1,8 @@
+{{#each users as |user| }}
+  {{ user.name }}
+
+  {{#each comments as |comment| }}
+    {{ user.name }} {{comment.title}}
+  {{/each}}
+
+{{/each}}
