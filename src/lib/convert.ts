@@ -7,20 +7,11 @@ const convert = input => {
   return output;
 };
 
-enum ScopeType {
-  EachHash,
-  EachArray,
-  EachArrayWithParams,
-  EachHashWithParams,
-}
-
 class Scope {
   public variables: string[];
-  public type: ScopeType;
 
-  constructor(variables: string[], type: ScopeType) {
+  constructor(variables: string[]) {
     this.variables = variables;
-    this.type = type;
   }
 }
 
@@ -31,8 +22,8 @@ class Scopes {
     this.scopes = [];
   }
 
-  push(variables: string[], scopeType: ScopeType) {
-    this.scopes.push(new Scope(variables, scopeType));
+  push(variables: string[]) {
+    this.scopes.push(new Scope(variables));
   }
 
   getScope(depth) {
@@ -101,7 +92,12 @@ class Transpiler {
             // variable = 'key';
             variable = 'forloop.counter0';
           } else {
-            variable = this.scopes.getScopedVariable(this.depth, path.parts.join('.'));
+            /**
+             * path.depth
+             * if variable starts with ../ path.depth is 1
+             * if variable starts with ../../ path.depth is 2
+             */
+            variable = this.scopes.getScopedVariable(this.depth - path.depth, path.parts.join('.'));
           }
 
           if (path.type === 'PathExpression') {
@@ -159,7 +155,7 @@ class Transpiler {
                 const blockParams = statement.program.blockParams;
                 // {{#each foo as |k, v|} => has 2 variable in the same context, k and v
                 if (blockParams.length === 1) {
-                  this.scopes.push(blockParams, ScopeType.EachArrayWithParams);
+                  this.scopes.push(blockParams);
 
                   if (condition.indexOf('.') < 0) {
                     condition = this.scopes.getScopedVariable(this.depth, condition);
@@ -167,7 +163,7 @@ class Transpiler {
 
                   this.buffer.push(`{% for ${blockParams[0]} in ${condition} %}`);
                 } else if (blockParams.length === 2) {
-                  this.scopes.push(blockParams, ScopeType.EachHashWithParams);
+                  this.scopes.push(blockParams);
                   this.buffer.push(
                     `{% for ${blockParams[1]}, ${blockParams[0]} in ${condition}.items %}`,
                   );
@@ -177,7 +173,7 @@ class Transpiler {
               } else {
                 // {{#each foo}}
                 scope = `${condition}_i`;
-                this.scopes.push([scope], ScopeType.EachArray);
+                this.scopes.push([scope]);
                 // TODO: detect 'key' in child programs, can be tricky with nested blocks that might reference using @../key
                 this.buffer.push(`{% for ${scope} in ${condition} %}`);
               }

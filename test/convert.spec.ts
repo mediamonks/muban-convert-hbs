@@ -8,6 +8,7 @@ describe('convert', () => {
   describe('from hbs to dtl', () => {
     // prettier-ignore
     const tests = [
+      'upper-context-variables',
       'nested-for-blockparams',
       'nested-for-conditional',
       'nested-for-data',
