@@ -1,7 +1,7 @@
 {% for users_i in users %}
   {% if users_i.foo %}
 
-    {% for comments_i in comments %}
+    {% for comments_i in users_i.comments %}
 
       {% if comments_i.title %}
         <a href="{{ comments_i.id }}">{{ comments_i.name }}</a>
@@ -10,7 +10,7 @@
     {% endfor %}
 
   {% else %}
-    {% for comments_i in comments %}
+    {% for comments_i in users_i.comments %}
       {{ comments_i.id }}
     {% endfor %}
   {% endif %}
