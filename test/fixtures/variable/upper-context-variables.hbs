@@ -1,0 +1,11 @@
+{{#each users }}
+  {{ user }}
+
+  {{#each comments }}
+    {{ ../name }} {{title}}
+
+    {{#each commenter }}
+      {{../../name}} {{name}}
+    {{/each}}
+  {{/each}}
+{{/each}}

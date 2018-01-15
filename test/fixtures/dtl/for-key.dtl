@@ -1,3 +1,0 @@
-{% for key, items_i in items %}
-  {{ key }}: {{ items_i }}
-{% endfor %}
