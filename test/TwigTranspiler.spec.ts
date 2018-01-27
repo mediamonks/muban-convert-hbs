@@ -2,9 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import 'mocha';
 import { expect } from 'chai';
-import { DjangoTranspiler } from '../src/lib/DjangoTranspiler';
+import { TwigTranspiler } from '../src/lib/TwigTranspiler';
 
-describe('convert from hbs to dtl', () => {
+describe('convert from hbs to twig', () => {
   // prettier-ignore
   const tests = [
       'comment/comment',
@@ -32,8 +32,11 @@ describe('convert from hbs to dtl', () => {
 
   tests.forEach(value => {
     it(`should convert "${value}"`, () => {
-      const expected = fs.readFileSync(path.resolve(__dirname, `./fixtures/${value}.dtl`), 'utf-8');
-      const actual = new DjangoTranspiler(
+      const expected = fs.readFileSync(
+        path.resolve(__dirname, `./fixtures/${value}.html.twig`),
+        'utf-8',
+      );
+      const actual = new TwigTranspiler(
         fs.readFileSync(path.resolve(__dirname, `./fixtures/${value}.hbs`), 'utf-8'),
       ).toString();
 

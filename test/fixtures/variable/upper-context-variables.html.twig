@@ -1,0 +1,11 @@
+{% for users_i in users %}
+  {{ users_i.user }}
+
+  {% for comments_i in users_i.comments %}
+    {{ users_i.name }} {{ comments_i.title }}
+
+    {% for commenter_i in comments_i.commenter %}
+      {{ users_i.name }} {{ commenter_i.name }}
+    {% endfor %}
+  {% endfor %}
+{% endfor %}

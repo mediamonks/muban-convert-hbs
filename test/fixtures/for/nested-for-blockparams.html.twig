@@ -1,0 +1,8 @@
+{% for user in users %}
+  {{ user.name }}
+
+  {% for comment in user.comments %}
+    {{ user.name }} {{ comment.title }}
+  {% endfor %}
+
+{% endfor %}
