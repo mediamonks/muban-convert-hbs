@@ -1,0 +1,2 @@
+{# this is not supported in django #}
+{% include "myPartial.html" with myOtherContext="does-not-work" %}

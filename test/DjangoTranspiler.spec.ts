@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import 'mocha';
 import { expect } from 'chai';
-import {Transpiler} from '../src/lib/Transpiler';
+import { DjangoTranspiler } from '../src/lib/DjangoTranspiler';
 
 describe('convert', () => {
   describe('from hbs to dtl', () => {
@@ -25,6 +25,10 @@ describe('convert', () => {
       'for/nested-for-blockparams',
       'for/nested-for-conditional',
       'for/nested-for-data',
+      'partial/basic',
+      'partial/context',
+      'partial/dynamic',
+      'partial/parameters',
     ];
 
     tests.forEach(value => {
@@ -33,7 +37,7 @@ describe('convert', () => {
           path.resolve(__dirname, `./fixtures/${value}.dtl`),
           'utf-8',
         );
-        const actual = new Transpiler(
+        const actual = new DjangoTranspiler(
           fs.readFileSync(path.resolve(__dirname, `./fixtures/${value}.hbs`), 'utf-8'),
         ).toString();
 
