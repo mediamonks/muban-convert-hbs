@@ -98,7 +98,7 @@ function generateSupportDoc(language) {
     if (category !== prevCategory) {
       tableOfContents += `* [${category}](#${category.toLowerCase()})\n`;
       testsContent += `
-  ### ${category}
+### ${category}
   `
     }
     prevCategory = category;

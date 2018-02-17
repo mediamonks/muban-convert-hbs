@@ -39,7 +39,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 
 
-  ### comment
+### comment
   
 #### comment/comment
 
@@ -65,7 +65,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-  ### variable
+### variable
   
 #### variable/variable
 
@@ -117,7 +117,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-  ### raw
+### raw
   
 #### raw/raw
 
@@ -135,7 +135,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-  ### if
+### if
   
 #### if/if
 
@@ -253,7 +253,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-  ### for
+### for
   
 #### for/for
 
@@ -443,7 +443,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-  ### partial
+### partial
   
 #### partial/basic
 

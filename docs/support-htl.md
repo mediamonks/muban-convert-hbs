@@ -188,7 +188,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 
 
-  ### comment
+### comment
   
 #### comment/comment
 
@@ -214,7 +214,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 ```
 
-  ### variable
+### variable
   
 #### variable/variable
 
@@ -266,7 +266,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 ```
 
-  ### raw
+### raw
   
 #### raw/raw
 
@@ -284,7 +284,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-  ### if
+### if
   
 #### if/if
 
@@ -446,7 +446,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-  ### for
+### for
   
 #### for/for
 
@@ -619,7 +619,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-  ### partial
+### partial
   
 #### partial/basic
 
