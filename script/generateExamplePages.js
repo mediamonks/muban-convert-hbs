@@ -103,7 +103,7 @@ function generateSupportDoc(language) {
     }
     prevCategory = category;
 
-    tableOfContents += `  * [${value.split('/').slice(1).join('/')}](${value.toLowerCase()})\n`;
+    tableOfContents += `  * [${value.split('/').slice(1).join('/')}](#${value.toLowerCase().replace(/\//gi, '')})\n`;
 
     testsContent += renderTest(value, input, output, 'htl');
   });
