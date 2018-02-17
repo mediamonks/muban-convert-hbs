@@ -1,0 +1,18 @@
+<sly data-sly-list.users_i="${ users }">
+  <sly data-sly-test.result1=${ users_i.foo }>
+
+    <sly data-sly-list.comments_i="${ users_i.comments }">
+
+      <sly data-sly-test.result2=${ comments_i.title }>
+        <a href="${ comments_i.id }">${ comments_i.name }</a>
+      </sly>
+
+    </sly>
+
+  </sly>
+  <sly data-sly-test=${ !(result1) }>
+    <sly data-sly-list.comments_i="${ users_i.comments }">
+      ${ comments_i.id }
+    </sly>
+  </sly>
+</sly>

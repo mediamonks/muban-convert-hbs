@@ -1,0 +1,8 @@
+<sly data-sly-list.user="${ users }">
+  ${ user.name }
+
+  <sly data-sly-list.comment="${ user.comments }">
+    ${ user.name } ${ comment.title }
+  </sly>
+
+</sly>

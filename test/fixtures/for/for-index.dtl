@@ -1,3 +1,3 @@
-{% for items_i in items %}
-  {{ forloop.counter0 }}: {{ items_i }}
+{% for users_i in users %}
+  {{ forloop.counter0 }}: {{ users_i }}
 {% endfor %}

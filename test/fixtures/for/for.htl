@@ -1,0 +1,3 @@
+<sly data-sly-list.users_i="${ users }">
+  <a href="${ users_i.foobar }">link</a>
+</sly>

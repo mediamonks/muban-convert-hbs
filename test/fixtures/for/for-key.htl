@@ -1,0 +1,3 @@
+<sly data-sly-list.map_i="${ map }">
+  ${ map_iList.index }: ${ map_i }
+</sly>

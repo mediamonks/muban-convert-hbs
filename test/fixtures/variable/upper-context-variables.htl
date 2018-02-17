@@ -1,0 +1,11 @@
+<sly data-sly-list.users_i="${ users }">
+  ${ users_i.name }
+
+  <sly data-sly-list.comments_i="${ users_i.comments }">
+    ${ users_i.name } ${ comments_i.title }
+
+    <sly data-sly-list.commenter_i="${ comments_i.commenter }">
+      ${ users_i.name } ${ commenter_i.name }
+    </sly>
+  </sly>
+</sly>

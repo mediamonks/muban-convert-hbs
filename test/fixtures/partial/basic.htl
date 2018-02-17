@@ -1,0 +1,1 @@
+<sly data-sly-use.lib="foo/bar.html" data-sly-call="${ lib.bar }" />

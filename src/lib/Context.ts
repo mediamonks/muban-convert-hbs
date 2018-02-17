@@ -1,3 +1,4 @@
+export type ReplacementMap = { [key: string]: string };
 /**
  * Holds information about the current Handlebars Context.
  * A new context is created when traversing inside a block that introduces new variables, e.g. 'each'
@@ -15,21 +16,33 @@ export default class Context {
    */
   private depth: number;
 
+  /**
+   * object will be shared between parent and child contexts
+   */
+  public shared: {
+    ifCounter: number;
+  };
+
   constructor() {
     // create empty scope at root level
     this.scopes = [new Scope([])];
     // set initial depth to 0
     this.depth = 0;
+
+    this.shared = {
+      ifCounter: 0,
+    };
   }
 
   /**
    * Add new values to the context and return the new context. The current context remains untouched.
    * @param {string[]} variables
+   * @param replacements
    * @return {Context} A new context.
    */
-  createChildContext(variables: Array<string>) {
+  createChildContext(variables: Array<string>, replacements?: ReplacementMap) {
     const context = this.clone();
-    context.scopes.push(new Scope(variables));
+    context.scopes.push(new Scope(variables, replacements));
     ++context.depth;
     return context;
   }
@@ -54,14 +67,27 @@ export default class Context {
    * @param {number} depth
    * @return {Array<string>}
    */
-  getScopesToDepth(depth: number): Array<string> {
+  getScopesToDepth(
+    depth: number,
+  ): { variables: Array<string>; replacements: Array<ReplacementMap> } {
     // NOTE: contains duplicates, but doesn't matter
-    return this.scopes.slice(0, depth + 1).reduce((acc, scope) => acc.concat(scope.variables), []);
+    const mergedScope = { variables: [], replacements: [] };
+    this.scopes.slice(0, depth + 1).forEach(scope => {
+      if (scope.variables) {
+        mergedScope.variables.push(...scope.variables);
+      }
+      if (scope.replacements) {
+        mergedScope.replacements = { ...mergedScope.replacements, ...scope.replacements };
+      }
+    });
+    return mergedScope;
   }
 
   getScopedVariable(path: hbs.AST.PathExpression) {
     // get the depth the variable is referencing (path.depth is higher when using ../)
     const varDepth = this.depth - path.depth;
+
+    // console.log('getScopedVariable', path);
 
     if (varDepth === 0) {
       // upper level is root, which has no scope vars, so do early exit
@@ -89,13 +115,18 @@ export default class Context {
     // get the scope by traversing up to a certain parent depth
     // when using ../ in the variable, the depth will lower
     // this will build op all explicit scope variables from the root up to the provided depth
-    const scopeVariables = this.getScopesToDepth(varDepth);
+    const { variables, replacements } = this.getScopesToDepth(varDepth);
 
-    // if the first path of the variable already in the current scope, or any
-    if (scopeVariables.includes(path.parts[0])) {
-      return path.parts.join('.');
+    // if the first path of the variable already in the current scope, or any parents
+    if (variables.includes(path.parts[0])) {
+      const match = path.parts.join('.');
+      if (match in replacements) {
+        return replacements[match];
+      }
+      return match;
     }
 
+    // console.log(' >> ', currentScope.value, path.parts);
     return [currentScope.value, path.parts].join('.');
   }
 
@@ -104,6 +135,7 @@ export default class Context {
     const context = new Context();
     context.scopes = this.scopes.concat();
     context.depth = this.depth;
+    context.shared = this.shared;
     return context;
   }
 }
@@ -115,13 +147,15 @@ export default class Context {
 export class Scope {
   public iterationType: string = IterationType.ARRAY;
   public variables: Array<string>;
+  public replacements: ReplacementMap;
 
   // alias vars for easy reference, these ones are for the `each` loop
   public value: string;
   public key: string;
 
-  constructor(variables: Array<string>) {
+  constructor(variables: Array<string>, replacements?: ReplacementMap) {
     this.variables = variables;
+    this.replacements = replacements;
 
     // NOTE: might require additional info if we handle other type of blockParam variables
     this.value = this.variables[0];

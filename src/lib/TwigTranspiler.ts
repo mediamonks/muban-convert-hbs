@@ -37,16 +37,7 @@ export class TwigTranspiler implements ITranspiler {
           let variable;
           if (path.original === '@index') {
             variable = 'loop.index0';
-            // } else if (path.original === '@key') {
-            //   // TODO: support "@../key"
-            //   // variable = 'key';
-            //   variable = 'forloop.counter0';
           } else {
-            /**
-             * path.depth
-             * if variable starts with ../ path.depth is 1
-             * if variable starts with ../../ path.depth is 2
-             */
             variable = this.context.getScopedVariable(path);
           }
 
@@ -137,7 +128,7 @@ export class TwigTranspiler implements ITranspiler {
                   key = childScope.key || 'key';
                 }
 
-                this.buffer.push(`{% for ${key}, ${value} in ${condition}.items %}`);
+                this.buffer.push(`{% for ${key}, ${value} in ${condition}|cast_to_array %}`);
               }
 
               this.buffer.push(t.toString());

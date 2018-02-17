@@ -1,0 +1,3 @@
+<sly data-sly-test.result1=${ foo }>
+  Foo
+</sly>

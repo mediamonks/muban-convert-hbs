@@ -1,0 +1,1 @@
+<sly data-sly-use.lib="${ myVariable }" data-sly-call="${ lib[myVariable] }" />

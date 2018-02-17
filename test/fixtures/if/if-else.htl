@@ -1,0 +1,6 @@
+<sly data-sly-test.isFoo=${ foo }>
+  Foo
+</sly>
+<sly data-sly-test=${ !(isFoo) }>
+  Bar
+</sly>

@@ -1,0 +1,9 @@
+<sly data-sly-test.result1=${ foo }>
+  Foo
+</sly>
+<sly data-sly-test=${ !(result1) }>
+  <sly data-sly-test.result2=${ bar }>
+    Bar
+  </sly>
+  Baz
+</sly>

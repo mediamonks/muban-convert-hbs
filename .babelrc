@@ -28,7 +28,6 @@
     }
   },
   "ignore": [
-    "src/lib/vendor/**/*.*",
-    "./test/_setup/arrow-function-coverage-fix.js"
+    "src/lib/vendor/**/*.*"
   ]
 }

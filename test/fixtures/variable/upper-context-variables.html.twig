@@ -1,5 +1,5 @@
 {% for users_i in users %}
-  {{ users_i.user }}
+  {{ users_i.name }}
 
   {% for comments_i in users_i.comments %}
     {{ users_i.name }} {{ comments_i.title }}

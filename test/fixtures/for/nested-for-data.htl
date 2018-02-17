@@ -1,0 +1,6 @@
+<sly data-sly-list.users_i="${ users }">
+  <a href="${ users_i.id }">${ users_i.name }</a>
+  <sly data-sly-list.comments_i="${ users_i.comments }">
+    ${ comments_i.name }
+  </sly>
+</sly>

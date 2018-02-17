@@ -1,6 +1,15 @@
 # muban-convert-hbs
 
-Convert muban hbs templates to django, twig and others.
+Convert Handlebars templates to HTL, django, twig and others. It supports all of the commonly used
+features, and will add support for additional Handlebars Helpers to implement additional features
+that are popular in the target template language.
+
+Handbelars templates are used in Muban to optimize frontend development for server-rendered HTML
+pages. This module is used to convert the development templates into server templates that can be
+used for the actual implementation, without having to do that manually.
+
+Using this module doesn't guarantee 100% perfect target templates, so some manual checking is
+required to make sure the resulting templates are doing what is intended.
 
 ## Installation
 
@@ -19,15 +28,10 @@ import fs from 'fs';
 import path from 'path';
 import convert from 'muban-convert-hbs';
 
+const htl = convert(fs.readFileSync(path.resolve(__dirname, './foo.hbs'), 'utf-8'), 'htl');
 const django = convert(fs.readFileSync(path.resolve(__dirname, './foo.hbs'), 'utf-8'), 'dtl');
 const twig = convert(fs.readFileSync(path.resolve(__dirname, 'foo.hbs'), 'utf-8'), 'twig');
 ```
-
-
-## Documentation
-
-View the [generated documentation](http://mediamonks.github.io/muban-convert-hbs/).
-
 
 ## Building
 
@@ -64,14 +68,9 @@ before committing, so you can be sure that everything checks out.
 
 ## Support
 
-Look at `test/fixtures/hbs/*.hbs` vs `test/fixtures/dtl/*.dtl` to see what is run through the tests.
+Look at the [test fixtures](./test/fixtures/) to see what is run through the tests.
 
-TODO:
-  * twig
-  
-Currently supported output languages are:
-
-#### Django Template Language
+In general, the following features are supported:
 
 * variables
 * raw
@@ -85,6 +84,18 @@ Currently supported output languages are:
   * @key
   * @index
   * as |block params|
+* partials
+  * passing context
+  * passing parameters
+  * dynamic using the lookup helper
+
+
+Please check this pages for more information about the supported template languages and the exact
+features that are supported there:
+
+* [HTL](./docs/support-htl.md)
+* [Django](./docs/support-dtl.md)
+* [Twig](./docs/support-twig.md)
 
 ## Contribute
 

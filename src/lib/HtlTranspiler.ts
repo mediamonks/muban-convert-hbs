@@ -2,7 +2,13 @@ import Handlebars from 'handlebars';
 import Context, { IterationType } from './Context';
 import ITranspiler from './ITranspiler';
 
-export class DjangoTranspiler implements ITranspiler {
+export interface ProgramOptions {
+  isConditionalInInverse?: boolean;
+  elseIfResultList?: Array<string>;
+  indent?: string;
+}
+
+export class HtlTranspiler implements ITranspiler {
   private buffer: any[];
   private parsed: hbs.AST.Program;
   private context: Context;
@@ -19,7 +25,10 @@ export class DjangoTranspiler implements ITranspiler {
     }
   }
 
-  parseProgram(program: hbs.AST.Program, isConditionalInInverse: boolean = false) {
+  parseProgram(
+    program: hbs.AST.Program,
+    { isConditionalInInverse = false, elseIfResultList = [], indent = '' }: ProgramOptions = {},
+  ) {
     // console.log('\n\n -- PROGRAM -- \n');
     // console.log(program);
     program.body.forEach((statement: hbs.AST.ProgramStatement) => {
@@ -32,24 +41,24 @@ export class DjangoTranspiler implements ITranspiler {
           // console.log('\n\nMustacheStatement\n');
           // console.log(statement);
           const path = <hbs.AST.PathExpression>statement.path;
-          const escaped = statement.escaped ? '' : '|safe';
+          const escaped = statement.escaped ? '' : " @ context='html'";
 
           let variable;
           if (path.original === '@index') {
-            variable = 'forloop.counter0';
+            variable = `${this.context.getCurrentScope().value}List.index`;
           } else {
             variable = this.context.getScopedVariable(path);
           }
 
           if (path.type === 'PathExpression') {
-            this.buffer.push(`{{ ${variable}${escaped} }}`);
+            this.buffer.push(`\${ ${variable}${escaped} }`);
           } else if (path.type === 'Literal') {
             throw new Error('not implemented');
           }
           break;
 
         case 'CommentStatement':
-          this.buffer.push(`{#${statement.value}#}`);
+          this.buffer.push(`<!--/*${statement.value}*/-->`);
           break;
 
         case 'BlockStatement':
@@ -62,30 +71,75 @@ export class DjangoTranspiler implements ITranspiler {
               const scopedCondition = this.context.getScopedVariable(statement
                 .params[0] as hbs.AST.PathExpression);
 
+              let currentTestResult;
+              // check for if alias
+              if (
+                statement.params.length === 3 &&
+                (<hbs.AST.PathExpression>statement.params[1]).original === 'as'
+              ) {
+                currentTestResult = (<hbs.AST.PathExpression>statement.params[2]).original;
+              } else {
+                ++this.context.shared.ifCounter;
+                currentTestResult = `result${this.context.shared.ifCounter}`;
+              }
+
               // use `else if` instead of else when this is the only if statement in an else block
-              this.buffer.push(`{% ${isConditionalInInverse ? 'el' : ''}if ${scopedCondition} %}`);
-              const t = new DjangoTranspiler(null, this.context, this.depth);
+              if (isConditionalInInverse) {
+                const elseIfCheck = `!(${elseIfResultList.join(' || ')})`;
+                this.buffer.push(
+                  `\n${indent}<sly data-sly-test.${currentTestResult}=\${ ${elseIfCheck} && ${scopedCondition} }>`,
+                );
+              } else {
+                this.buffer.push(
+                  `<sly data-sly-test.${currentTestResult}=\${ ${scopedCondition} }>`,
+                );
+              }
+
+              const t = new HtlTranspiler(null, this.context, this.depth);
               this.buffer.push(t.parseProgram(statement.program).toString());
 
+              this.buffer.push(`</sly>`);
+
+              // else section
               if (statement.inverse) {
-                // else section
-                const isInverseOnlyConditional = DjangoTranspiler.isOnlyCondition(
-                  statement.inverse,
-                );
-                const t = new DjangoTranspiler(null, this.context, this.depth);
-                t.parseProgram(statement.inverse, isInverseOnlyConditional);
+                let indent = '';
+                const ifContentStatement =
+                  (
+                    <any>statement.program.body
+                      .concat()
+                      .reverse()
+                      .find(s => s.type === 'ContentStatement') || {}
+                  ).original || '';
+
+                const match = /\n([\t ]*)$/gi.exec(ifContentStatement);
+                if (match && match[1]) {
+                  indent = match[1];
+                }
+
+                const childElseIfResultList = elseIfResultList.concat(currentTestResult);
+
+                // if the else body only has an 'if' statement, we can combine it into an 'else if'
+                const isInverseOnlyConditional = HtlTranspiler.isOnlyCondition(statement.inverse);
+                const t = new HtlTranspiler(null, this.context, this.depth);
+                t.parseProgram(statement.inverse, {
+                  indent,
+                  isConditionalInInverse: isInverseOnlyConditional,
+                  elseIfResultList: childElseIfResultList,
+                });
 
                 // child will render a `else if`
                 if (!isInverseOnlyConditional) {
-                  this.buffer.push(`{% else %}`);
+                  const elseCheck = `!(${childElseIfResultList.join(' || ')})`;
+                  this.buffer.push(`\n${indent}<sly data-sly-test=\${ ${elseCheck} }>`);
                 }
+
                 this.buffer.push(t.toString());
+
+                if (!isInverseOnlyConditional) {
+                  this.buffer.push(`</sly>`);
+                }
               }
 
-              // parent will close this
-              if (!isConditionalInInverse) {
-                this.buffer.push(`{% endif %}`);
-              }
               break;
             }
 
@@ -97,7 +151,13 @@ export class DjangoTranspiler implements ITranspiler {
               if (statement.program.blockParams) {
                 // {{#each foo as |key, value|}
                 const blockParams = statement.program.blockParams;
-                childContext = this.context.createChildContext(blockParams);
+                // TODO: in AEM, when iterating an object, only the key will be assigned, and value will be `condition[key]`
+                // This means that we should replace the first blockParams by that
+                // childContext = this.context.createChildContext([`${condition}[${blockParams[1] || 'key'}]`, ...blockParams.slice(1)]);
+                const replacements = {
+                  [blockParams[0]]: `${condition}[${blockParams[1] || 'key'}]`,
+                };
+                childContext = this.context.createChildContext(blockParams, replacements);
 
                 // {{#each foo as |k, v|} => has 2 variable in the same context, k and v
                 if (blockParams.length === 2) {
@@ -108,7 +168,7 @@ export class DjangoTranspiler implements ITranspiler {
                 childContext = this.context.createChildContext([`${condition.split('.').pop()}_i`]);
               }
 
-              const t = new DjangoTranspiler(null, childContext, this.depth + 1);
+              const t = new HtlTranspiler(null, childContext, this.depth + 1);
               t.parseProgram(statement.program);
               const childScope = childContext.getCurrentScope();
 
@@ -119,22 +179,24 @@ export class DjangoTranspiler implements ITranspiler {
 
               if (childScope.iterationType === IterationType.ARRAY) {
                 // Array iteration
-                this.buffer.push(`{% for ${childScope.value} in ${condition} %}`);
+                this.buffer.push(`<sly data-sly-list.${childScope.value}="\${ ${condition} }">`);
               } else {
                 // Object iteration
                 let key = 'key';
-                let value = 'value';
+                // let value = 'value';
 
                 if (childScope.value) {
-                  value = childScope.value;
+                  // value = childScope.value;
                   key = childScope.key || 'key';
                 }
 
-                this.buffer.push(`{% for ${key}, ${value} in ${condition}.items %}`);
+                // TODO 'value' cannot be used, you have to do condition[key], so that has to be renamed
+                this.buffer.push(`<sly data-sly-list.${key}="\${ ${condition} }">`);
+                // this.buffer.push(`{% for ${key}, ${value} in ${condition}.items %}`);
               }
 
               this.buffer.push(t.toString());
-              this.buffer.push(`{% endfor %}`);
+              this.buffer.push(`</sly>`);
               break;
             }
           }
@@ -145,31 +207,33 @@ export class DjangoTranspiler implements ITranspiler {
           // console.log(statement);
 
           let name: string;
+          let templateName: string;
           if (statement.name.type === 'SubExpression') {
             const expression = statement.name as hbs.AST.SubExpression;
             // TODO: add generic helper support, which includes lookup
             if (expression.path.original === 'lookup') {
               // TODO: add scope support, now always assumes '.' (current scope)
-              name = (<hbs.AST.StringLiteral>expression.params[1]).value;
+              const varName = (<hbs.AST.StringLiteral>expression.params[1]).value;
+              name = `\${ ${varName} }`;
+              templateName = `lib[${varName}]`;
             }
           } else {
-            name = (<hbs.AST.PathExpression>statement.name).parts
-              .filter(p => p !== 'hbs')
-              .join('/');
-            name = `"${name}.html"`;
+            const nameParts = (<hbs.AST.PathExpression>statement.name).parts.filter(
+              p => p !== 'hbs',
+            );
+
+            templateName = `lib.${nameParts[nameParts.length - 1]}`;
+            name = `${nameParts.join('/')}.html`;
           }
 
-          let context = '';
           if (statement.params.length) {
-            // TODO: django doesn't support pushing/replacing the context, only adding/replacing additional variables
-            context = ` with ${this.context.getScopedVariable(<hbs.AST.PathExpression>statement
-              .params[0])}="does-not-work"`;
+            // TODO: AEM doesn't support pushing/replacing the context, only adding/replacing additional variables
           }
 
           let params = '';
           if (statement.hash) {
             params =
-              ' with ' +
+              ' @ ' +
               statement.hash.pairs
                 .map((pair: hbs.AST.HashPair) => {
                   const key = `${pair.key}=`;
@@ -179,7 +243,7 @@ export class DjangoTranspiler implements ITranspiler {
                     )}`;
                   }
                   if (pair.value.type === 'StringLiteral') {
-                    return `${key}"${(<hbs.AST.StringLiteral>pair.value).value}"`;
+                    return `${key}'${(<hbs.AST.StringLiteral>pair.value).value}'`;
                   }
                   if (pair.value.type === 'NumberLiteral') {
                     return `${key}${(<hbs.AST.NumberLiteral>pair.value).value}`;
@@ -190,10 +254,12 @@ export class DjangoTranspiler implements ITranspiler {
                   return '';
                 })
                 .filter(_ => _)
-                .join(' ');
+                .join(', ');
           }
 
-          this.buffer.push(`{% include ${name}${context}${params} %}`);
+          this.buffer.push(
+            `<sly data-sly-use.lib="${name}" data-sly-call="\${ ${templateName}${params} }" />`,
+          );
         }
       }
     });
