@@ -1,7 +1,7 @@
 {
   "name": "muban-convert-hbs",
-  "version": "0.1.0",
-  "description": "Convert muban hbs templates to django, twig and others.",
+  "version": "1.0.0",
+  "description": "Convert muban hbs templates to htl, django, twig and others.",
   "main": "./index.js",
   "types": "./index.d.ts",
   "scripts": {
@@ -52,6 +52,8 @@
     "muban",
     "mediamonks",
     "handlebars",
+    "htl",
+    "aem",
     "hbs",
     "django",
     "twig"
