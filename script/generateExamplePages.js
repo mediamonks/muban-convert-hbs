@@ -122,18 +122,19 @@ ${testsContent}
 `;
 
   fs.writeFileSync(path.resolve(__dirname, `../docs/support-${language}.md`), document, 'utf-8');
+  console.log(`Generated support-${language}.md`);
 }
 
 function renderTest(value, input, output, language) {
   return `
 #### ${value}
 
-**hbs input**
+hbs input:
 \`\`\`html
 ${input}
 \`\`\`
 
-**${language} output**
+${language} output:
 \`\`\`html
 ${output}
 \`\`\`

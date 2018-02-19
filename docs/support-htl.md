@@ -76,10 +76,10 @@ The following example displays how the result of the `if` is used to create an e
 ```
 
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test=${ !(result1) }>
+<sly data-sly-test="${ !(result1) }">
   Bar
 </sly>
 ```
@@ -98,13 +98,13 @@ used in the `else`. Notice the `as isFoo`.
 ```
 
 ```html
-<sly data-sly-test.isFoo=${ foo }>
+<sly data-sly-test.isFoo="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.result1=${ !(isFoo) || bar }>
+<sly data-sly-test.result1="${ !(isFoo) || bar }">
   Bar
 </sly>
-<sly data-sly-test=${ !(isFoo || result1) }>
+<sly data-sly-test="${ !(isFoo || result1) }">
   Baz
 </sly>
 ```
@@ -192,7 +192,7 @@ The following Handlebars to HTL conversions are currently supported:
   
 #### comment/comment
 
-**hbs input**
+hbs input:
 ```html
 <div class="entry">
   {{!-- comment 1 --}}
@@ -203,7 +203,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 <div class="entry">
   <!--/* comment 1 */-->
@@ -218,14 +218,14 @@ The following Handlebars to HTL conversions are currently supported:
   
 #### variable/variable
 
-**hbs input**
+hbs input:
 ```html
 <h1>{{ foo }}</h1>
 <h1>{{ foo.bar }}</h1>
 
 ```
 
-**htl output**
+htl output:
 ```html
 <h1>${ foo }</h1>
 <h1>${ foo.bar }</h1>
@@ -234,7 +234,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 #### variable/upper-context-variables
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{ name }}
@@ -250,7 +250,7 @@ The following Handlebars to HTL conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
   ${ users_i.name }
@@ -270,14 +270,14 @@ The following Handlebars to HTL conversions are currently supported:
   
 #### raw/raw
 
-**hbs input**
+hbs input:
 ```html
 {{ escaped }}
 {{{ notEscaped }}}
 
 ```
 
-**htl output**
+htl output:
 ```html
 ${ escaped }
 ${ notEscaped @ context='html' }
@@ -288,7 +288,7 @@ ${ notEscaped @ context='html' }
   
 #### if/if
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -296,9 +296,9 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test="${ foo }">
   Foo
 </sly>
 
@@ -306,7 +306,7 @@ ${ notEscaped @ context='html' }
 
 #### if/if-else
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo as isFoo }}
   Foo
@@ -316,12 +316,12 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.isFoo=${ foo }>
+<sly data-sly-test.isFoo="${ foo }">
   Foo
 </sly>
-<sly data-sly-test=${ !(isFoo) }>
+<sly data-sly-test="${ !(isFoo) }">
   Bar
 </sly>
 
@@ -329,7 +329,7 @@ ${ notEscaped @ context='html' }
 
 #### if/if-elseif
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -339,12 +339,12 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.result2=${ !(result1) && bar }>
+<sly data-sly-test="${ !(result1) && bar }">
   Bar
 </sly>
 
@@ -352,7 +352,7 @@ ${ notEscaped @ context='html' }
 
 #### if/if-else-if
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -365,13 +365,13 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test=${ !(result1) }>
-  <sly data-sly-test.result2=${ bar }>
+<sly data-sly-test="${ !(result1) }">
+  <sly data-sly-test="${ bar }">
     Bar
   </sly>
   Baz
@@ -381,7 +381,7 @@ ${ notEscaped @ context='html' }
 
 #### if/if-elseif-else
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -393,15 +393,15 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.result2=${ !(result1) && bar }>
+<sly data-sly-test.result2="${ !(result1) && bar }">
   Bar
 </sly>
-<sly data-sly-test=${ !(result1 || result2) }>
+<sly data-sly-test="${ !(result1 || result2) }">
   Foobar
 </sly>
 
@@ -409,7 +409,7 @@ ${ notEscaped @ context='html' }
 
 #### if/if-complex
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -426,21 +426,21 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.isBar=${ !(result1) && bar }>
+<sly data-sly-test.isBar="${ !(result1) && bar }">
   Bar
-  <sly data-sly-test.result2=${ bb }>
+  <sly data-sly-test="${ bb }">
     bb
   </sly>
 </sly>
-<sly data-sly-test.result3=${ !(result1 || isBar) && baz }>
+<sly data-sly-test.result2="${ !(result1 || isBar) && baz }">
   Baz
 </sly>
-<sly data-sly-test=${ !(result1 || isBar || result3) }>
+<sly data-sly-test="${ !(result1 || isBar || result2) }">
   Foobar
 </sly>
 
@@ -450,7 +450,7 @@ ${ notEscaped @ context='html' }
   
 #### for/for
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ foobar }}">link</a>
@@ -458,7 +458,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
   <a href="${ users_i.foobar }">link</a>
@@ -468,7 +468,7 @@ ${ notEscaped @ context='html' }
 
 #### for/for-data
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ foobar }}">{{ this }}</a>
@@ -476,7 +476,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
   <a href="${ users_i.foobar }">${ users_i }</a>
@@ -486,7 +486,7 @@ ${ notEscaped @ context='html' }
 
 #### for/for-index
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{ @index }}: {{ this }}
@@ -494,7 +494,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
   ${ users_iList.index }: ${ users_i }
@@ -504,7 +504,7 @@ ${ notEscaped @ context='html' }
 
 #### for/for-blockparams
 
-**hbs input**
+hbs input:
 ```html
 {{#each map as |value key| }}
   {{ key }}: {{ value }}
@@ -512,7 +512,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.key="${ map }">
   ${ key }: ${ map[key] }
@@ -522,7 +522,7 @@ ${ notEscaped @ context='html' }
 
 #### for/nested-for-blockparams
 
-**hbs input**
+hbs input:
 ```html
 {{#each users as |user| }}
   {{ user.name }}
@@ -535,7 +535,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.user="${ users }">
   ${ user.name }
@@ -550,7 +550,7 @@ ${ notEscaped @ context='html' }
 
 #### for/nested-for-conditional
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{#if foo }}
@@ -572,21 +572,21 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
-  <sly data-sly-test.result1=${ users_i.foo }>
+  <sly data-sly-test.result1="${ users_i.foo }">
 
     <sly data-sly-list.comments_i="${ users_i.comments }">
 
-      <sly data-sly-test.result2=${ comments_i.title }>
+      <sly data-sly-test="${ comments_i.title }">
         <a href="${ comments_i.id }">${ comments_i.name }</a>
       </sly>
 
     </sly>
 
   </sly>
-  <sly data-sly-test=${ !(result1) }>
+  <sly data-sly-test="${ !(result1) }">
     <sly data-sly-list.comments_i="${ users_i.comments }">
       ${ comments_i.id }
     </sly>
@@ -597,7 +597,7 @@ ${ notEscaped @ context='html' }
 
 #### for/nested-for-data
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ id }}">{{ name }}</a>
@@ -608,7 +608,7 @@ ${ notEscaped @ context='html' }
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-list.users_i="${ users }">
   <a href="${ users_i.id }">${ users_i.name }</a>
@@ -623,13 +623,13 @@ ${ notEscaped @ context='html' }
   
 #### partial/basic
 
-**hbs input**
+hbs input:
 ```html
 {{> foo/bar.hbs }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-use.lib="foo/bar.html" data-sly-call="${ lib.bar }" />
 
@@ -637,13 +637,13 @@ ${ notEscaped @ context='html' }
 
 #### partial/dynamic
 
-**hbs input**
+hbs input:
 ```html
 {{> (lookup . 'myVariable') }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-use.lib="${ myVariable }" data-sly-call="${ lib[myVariable] }" />
 
@@ -651,13 +651,13 @@ ${ notEscaped @ context='html' }
 
 #### partial/parameters
 
-**hbs input**
+hbs input:
 ```html
 {{> myPartial name=firstName age=18 foo="bar" baz=true }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 <sly data-sly-use.lib="myPartial.html" data-sly-call="${ lib.myPartial @ name=firstName, age=18, foo='bar', baz=true }" />
 

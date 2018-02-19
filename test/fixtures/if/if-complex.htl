@@ -1,15 +1,15 @@
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.isBar=${ !(result1) && bar }>
+<sly data-sly-test.isBar="${ !(result1) && bar }">
   Bar
-  <sly data-sly-test.result2=${ bb }>
+  <sly data-sly-test="${ bb }">
     bb
   </sly>
 </sly>
-<sly data-sly-test.result3=${ !(result1 || isBar) && baz }>
+<sly data-sly-test.result2="${ !(result1 || isBar) && baz }">
   Baz
 </sly>
-<sly data-sly-test=${ !(result1 || isBar || result3) }>
+<sly data-sly-test="${ !(result1 || isBar || result2) }">
   Foobar
 </sly>

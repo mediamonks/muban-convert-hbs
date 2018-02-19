@@ -1,6 +1,6 @@
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.result2=${ !(result1) && bar }>
+<sly data-sly-test="${ !(result1) && bar }">
   Bar
 </sly>

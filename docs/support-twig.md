@@ -43,7 +43,7 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### comment/comment
 
-**hbs input**
+hbs input:
 ```html
 <div class="entry">
   {{!-- comment 1 --}}
@@ -54,7 +54,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 <div class="entry">
   {# comment 1 #}
@@ -69,14 +69,14 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### variable/variable
 
-**hbs input**
+hbs input:
 ```html
 <h1>{{ foo }}</h1>
 <h1>{{ foo.bar }}</h1>
 
 ```
 
-**htl output**
+htl output:
 ```html
 <h1>{{ foo }}</h1>
 <h1>{{ foo.bar }}</h1>
@@ -85,7 +85,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### variable/upper-context-variables
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{ name }}
@@ -101,7 +101,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   {{ users_i.name }}
@@ -121,14 +121,14 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### raw/raw
 
-**hbs input**
+hbs input:
 ```html
 {{ escaped }}
 {{{ notEscaped }}}
 
 ```
 
-**htl output**
+htl output:
 ```html
 {{ escaped }}
 {{ notEscaped|raw }}
@@ -139,7 +139,7 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### if/if
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -147,7 +147,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% if foo %}
   Foo
@@ -157,7 +157,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### if/if-else
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo as isFoo }}
   Foo
@@ -167,7 +167,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% if foo %}
   Foo
@@ -179,7 +179,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### if/if-elseif
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -189,7 +189,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% if foo %}
   Foo
@@ -201,7 +201,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### if/if-else-if
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -214,7 +214,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% if foo %}
   Foo
@@ -229,7 +229,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### if/if-elseif-else
 
-**hbs input**
+hbs input:
 ```html
 {{#if foo }}
   Foo
@@ -241,7 +241,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% if foo %}
   Foo
@@ -257,7 +257,7 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### for/for
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ foobar }}">link</a>
@@ -265,7 +265,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   <a href="{{ users_i.foobar }}">link</a>
@@ -275,7 +275,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/for-data
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ foobar }}">{{ this }}</a>
@@ -283,7 +283,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   <a href="{{ users_i.foobar }}">{{ users_i }}</a>
@@ -293,7 +293,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/for-index
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{ @index }}: {{ this }}
@@ -301,7 +301,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   {{ loop.index0 }}: {{ users_i }}
@@ -311,7 +311,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/for-blockparams
 
-**hbs input**
+hbs input:
 ```html
 {{#each map as |value key| }}
   {{ key }}: {{ value }}
@@ -319,7 +319,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for key, value in map|cast_to_array %}
   {{ key }}: {{ value }}
@@ -329,7 +329,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/for-key
 
-**hbs input**
+hbs input:
 ```html
 {{#each map }}
   {{ @key }}: {{ this }}
@@ -337,7 +337,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for key, map_i in map|cast_to_array %}
   {{ key }}: {{ map_i }}
@@ -347,7 +347,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/nested-for-blockparams
 
-**hbs input**
+hbs input:
 ```html
 {{#each users as |user| }}
   {{ user.name }}
@@ -360,7 +360,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for user in users %}
   {{ user.name }}
@@ -375,7 +375,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/nested-for-conditional
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   {{#if foo }}
@@ -397,7 +397,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   {% if users_i.foo %}
@@ -421,7 +421,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### for/nested-for-data
 
-**hbs input**
+hbs input:
 ```html
 {{#each users }}
   <a href="{{ id }}">{{ name }}</a>
@@ -432,7 +432,7 @@ The following Handlebars to Twig conversions are currently supported:
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% for users_i in users %}
   <a href="{{ users_i.id }}">{{ users_i.name }}</a>
@@ -447,13 +447,13 @@ The following Handlebars to Twig conversions are currently supported:
   
 #### partial/basic
 
-**hbs input**
+hbs input:
 ```html
 {{> foo/bar.hbs }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% include 'foo/bar.html' %}
 
@@ -461,14 +461,14 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### partial/context
 
-**hbs input**
+hbs input:
 ```html
 {{! this is not supported in django }}
 {{> myPartial myOtherContext }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 {# this is not supported in django #}
 {% include 'myPartial.html' with myOtherContext %}
@@ -477,13 +477,13 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### partial/dynamic
 
-**hbs input**
+hbs input:
 ```html
 {{> (lookup . 'myVariable') }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% include myVariable %}
 
@@ -491,13 +491,13 @@ The following Handlebars to Twig conversions are currently supported:
 
 #### partial/parameters
 
-**hbs input**
+hbs input:
 ```html
 {{> myPartial name=firstName age=18 foo="bar" baz=true }}
 
 ```
 
-**htl output**
+htl output:
 ```html
 {% include 'myPartial.html' with {'name':firstName, 'age':18, 'foo':"bar", 'baz':true} %}
 

@@ -20,6 +20,7 @@
     "clean:npm": "shx rm -rf lib tmp index.js",
     "doc": "npm-run-all -p doc:*",
     "doc:typedoc": "typedoc --out docs/ src/ --mode file",
+    "doc:support": "node ./script/generateExamplePages.js",
     "lint": "npm-run-all lint:*",
     "lint:js": "eslint src --ext .js --cache",
     "lint:ts": "tslint src/**/*.ts -c tslint.json -p tsconfig.json -t verbose",

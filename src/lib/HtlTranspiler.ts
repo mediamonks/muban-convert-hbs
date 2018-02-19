@@ -71,27 +71,28 @@ export class HtlTranspiler implements ITranspiler {
               const scopedCondition = this.context.getScopedVariable(statement
                 .params[0] as hbs.AST.PathExpression);
 
-              let currentTestResult;
+              let currentTestResult = '';
               // check for if alias
               if (
                 statement.params.length === 3 &&
                 (<hbs.AST.PathExpression>statement.params[1]).original === 'as'
               ) {
-                currentTestResult = (<hbs.AST.PathExpression>statement.params[2]).original;
-              } else {
+                currentTestResult = `${(<hbs.AST.PathExpression>statement.params[2]).original}`;
+              } else if (statement.inverse) {
                 ++this.context.shared.ifCounter;
                 currentTestResult = `result${this.context.shared.ifCounter}`;
               }
+              const testResultDeclaration = currentTestResult ? `.${currentTestResult}` : '';
 
               // use `else if` instead of else when this is the only if statement in an else block
               if (isConditionalInInverse) {
                 const elseIfCheck = `!(${elseIfResultList.join(' || ')})`;
                 this.buffer.push(
-                  `\n${indent}<sly data-sly-test.${currentTestResult}=\${ ${elseIfCheck} && ${scopedCondition} }>`,
+                  `\n${indent}<sly data-sly-test${testResultDeclaration}="\${ ${elseIfCheck} && ${scopedCondition} }">`,
                 );
               } else {
                 this.buffer.push(
-                  `<sly data-sly-test.${currentTestResult}=\${ ${scopedCondition} }>`,
+                  `<sly data-sly-test${testResultDeclaration}="\${ ${scopedCondition} }">`,
                 );
               }
 
@@ -130,7 +131,7 @@ export class HtlTranspiler implements ITranspiler {
                 // child will render a `else if`
                 if (!isInverseOnlyConditional) {
                   const elseCheck = `!(${childElseIfResultList.join(' || ')})`;
-                  this.buffer.push(`\n${indent}<sly data-sly-test=\${ ${elseCheck} }>`);
+                  this.buffer.push(`\n${indent}<sly data-sly-test="\${ ${elseCheck} }">`);
                 }
 
                 this.buffer.push(t.toString());

@@ -75,10 +75,10 @@ The following example displays how the result of the `if` is used to create an e
 ```
 
 ```html
-<sly data-sly-test.result1=${ foo }>
+<sly data-sly-test.result1="${ foo }">
   Foo
 </sly>
-<sly data-sly-test=${ !(result1) }>
+<sly data-sly-test="${ !(result1) }">
   Bar
 </sly>
 ```
@@ -97,13 +97,13 @@ used in the `else`. Notice the `as isFoo`.
 ```
 
 ```html
-<sly data-sly-test.isFoo=${ foo }>
+<sly data-sly-test.isFoo="${ foo }">
   Foo
 </sly>
-<sly data-sly-test.result1=${ !(isFoo) || bar }>
+<sly data-sly-test.result1="${ !(isFoo) || bar }">
   Bar
 </sly>
-<sly data-sly-test=${ !(isFoo || result1) }>
+<sly data-sly-test="${ !(isFoo || result1) }">
   Baz
 </sly>
 ```
