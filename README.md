@@ -27,6 +27,7 @@ npm i -S muban-convert-hbs
 import fs from 'fs';
 import path from 'path';
 import convert from 'muban-convert-hbs';
+// var convert = require('muban-convert-hbs').default; // when using es5
 
 const htl = convert(fs.readFileSync(path.resolve(__dirname, './foo.hbs'), 'utf-8'), 'htl');
 const django = convert(fs.readFileSync(path.resolve(__dirname, './foo.hbs'), 'utf-8'), 'dtl');
