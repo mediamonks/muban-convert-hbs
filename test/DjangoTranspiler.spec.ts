@@ -8,6 +8,7 @@ describe('convert from hbs to dtl', () => {
   // prettier-ignore
   const tests = [
       'comment/comment',
+      'condition/condition',
       'variable/variable',
       'variable/upper-context-variables',
       'raw/raw',
@@ -28,6 +29,7 @@ describe('convert from hbs to dtl', () => {
       'partial/context',
       'partial/dynamic',
       'partial/parameters',
+      'unknown/unknown',
     ];
 
   tests.forEach(value => {

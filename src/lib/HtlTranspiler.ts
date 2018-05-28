@@ -68,8 +68,25 @@ export class HtlTranspiler implements ITranspiler {
           const type = statement.path.original;
           switch (type) {
             case 'if': {
-              const scopedCondition = this.context.getScopedVariable(statement
-                .params[0] as hbs.AST.PathExpression);
+              const condition = statement.params[0];
+              let scopedCondition;
+
+              if (condition.type === 'SubExpression') {
+                if ((condition as hbs.AST.SubExpression).path.original === 'condition') {
+                  scopedCondition = (condition as hbs.AST.SubExpression).params
+                    .map(param => {
+                      if (param.type === 'PathExpression') {
+                        return this.context.getScopedVariable(param as hbs.AST.PathExpression);
+                      }
+                      return (param as hbs.AST.StringLiteral).value;
+                    })
+                    .join(' ');
+                }
+              } else {
+                scopedCondition = this.context.getScopedVariable(
+                  condition as hbs.AST.PathExpression,
+                );
+              }
 
               let currentTestResult = '';
               // check for if alias
@@ -200,6 +217,19 @@ export class HtlTranspiler implements ITranspiler {
               this.buffer.push(`</sly>`);
               break;
             }
+
+            default: {
+              // tslint:disable-next-line:no-console
+              console.log('Unsupported block ', type);
+
+              this.buffer.push(`{{# ${type} }}`);
+
+              const t = new HtlTranspiler(null, this.context, this.depth);
+              t.parseProgram(statement.program);
+              this.buffer.push(t.toString());
+
+              this.buffer.push(`{{/${type}}}`);
+            }
           }
           break;
 
@@ -209,7 +239,12 @@ export class HtlTranspiler implements ITranspiler {
 
           let name: string;
           let templateName: string;
-          if (statement.name.type === 'SubExpression') {
+          if (statement.name.type === 'StringLiteral') {
+            const expression = (statement.name as any) as hbs.AST.StringLiteral;
+            name = `${expression.value.replace('.hbs', '.html')}`;
+            const varName = 'todo';
+            templateName = `lib.${varName}`;
+          } else if (statement.name.type === 'SubExpression') {
             const expression = statement.name as hbs.AST.SubExpression;
             // TODO: add generic helper support, which includes lookup
             if (expression.path.original === 'lookup') {
@@ -261,6 +296,13 @@ export class HtlTranspiler implements ITranspiler {
           this.buffer.push(
             `<sly data-sly-use.lib="${name}" data-sly-call="\${ ${templateName}${params} }" />`,
           );
+
+          break;
+        }
+
+        default: {
+          // tslint:disable-next-line:no-console
+          console.log('Unsupported statements ', statement.type);
         }
       }
     });

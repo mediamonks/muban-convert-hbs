@@ -1,0 +1,3 @@
+<sly data-sly-test="${ foo === 123 }">
+  Foo
+</sly>
