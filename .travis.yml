@@ -22,8 +22,7 @@ after_script:
 deploy:
   - provider: npm
     email: 'devmonk@mediamonks.com'
-    api_key:
-      secure: 'jBqc/R+tyJgx/j8yzeXXwuJbqVU8EbOXgZV620f4dvYPoF3sirk92Q8U1X85rX3cg+gxx1Bq4j0BsVtmiSWqSgMav3fKb9WBKd+8aNC/3hiJdun09EPknjXQXu1n1fho3VjEZ43PMZ/JboMQ9mJ5exz91yF/zpXy/jzowaf0MExYoYgNJrnj7NUU6avfIQzzOV5na5p/dNDjjGFXEqwHgJr673K845akcviFa7BADpPDugfx8nxCb88KuiO1TAa2UvBGyo16JBDKgnjh0uazVkrv+fX8AhAKti1K71LUI+mA5TEjKcgNu+A01AMfP+Pw7+MaOvvP9dZEmhuewXbJIhD3age70yhtBN23txsAr8WtAdkYBkCHnK1fYdTvgr91SvB7oTt8en7wP+9/ohHCA3vnmrMJC2f61zlW8VW3vOCFgUyKPwlHn0lCuM1GBL+Q6nV2jCOokMaalYRI1eJi2EKttrZb3afWoSs0adw4oSd567BZOhYTpRgCJ9tmactdGdYv+1DPcRm02b5V+vCKNA6OHWJOQ9w1/4/y+OLLFhDTK+Fv4sqRN+paKkT+Gd1lZInz5q5OvoDGRzrQOcUC+oTJeWXJRd6dQ/6IVTJUVraeGvwBa+f+mLonaVQC7Q3zlXZJGaHkYESE7eMP0mM2C1NPpQ15t6aaF23g9vPv4JI='
+    api_key: $NPM_TOKEN
     on:
       tags: true
       node: '8'
