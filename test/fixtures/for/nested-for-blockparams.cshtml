@@ -1,0 +1,9 @@
+@foreach (var user in users)
+{
+  user.name
+
+  foreach (var comment in user.comments)
+  {
+    user.name comment.title
+  }
+}
