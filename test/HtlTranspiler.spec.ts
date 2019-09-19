@@ -22,6 +22,7 @@ describe('convert from hbs to htl', () => {
     'for/for-data',
     'for/for-index',
     'for/for-blockparams',
+    'for/for-nested-variable',
     // 'for/for-key', // array loops don't ever have a key in HTL
     'for/nested-for-blockparams',
     'for/nested-for-conditional',

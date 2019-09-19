@@ -22,6 +22,7 @@ describe('convert from hbs to twig', () => {
     'for/for-index',
     'for/for-blockparams',
     'for/for-key',
+    'for/for-nested-variable',
     'for/nested-for-blockparams',
     'for/nested-for-conditional',
     'for/nested-for-data',
