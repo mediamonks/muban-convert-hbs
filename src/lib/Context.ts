@@ -127,7 +127,7 @@ export default class Context {
     }
 
     // console.log(' >> ', currentScope.value, path.parts);
-    return [currentScope.value, path.parts].join('.');
+    return [currentScope.value, ...path.parts].join('.');
   }
 
   // clone the current Context
