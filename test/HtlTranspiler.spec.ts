@@ -9,6 +9,10 @@ describe('convert from hbs to htl', () => {
   const tests = [
     'comment/comment',
     'condition/condition',
+    'condition/condition-unless',
+    'condition/condition-with',
+    'condition/condition-greater-than',
+    'condition/condition-is',
     'variable/variable',
     'variable/upper-context-variables',
     'raw/raw',

@@ -121,13 +121,10 @@ export class HtlTranspiler implements ITranspiler {
               // else section
               if (statement.inverse) {
                 let indent = '';
-                const ifContentStatement =
-                  (
-                    <any>statement.program.body
+                const ifContentStatement = (<any>statement.program.body
                       .concat()
                       .reverse()
-                      .find(s => s.type === 'ContentStatement') || {}
-                  ).original || '';
+                      .find(s => s.type === 'ContentStatement') || {}).original || '';
 
                 const match = /\n([\t ]*)$/gi.exec(ifContentStatement);
                 if (match && match[1]) {
@@ -157,6 +154,70 @@ export class HtlTranspiler implements ITranspiler {
                   this.buffer.push(`</sly>`);
                 }
               }
+
+              break;
+            }
+
+            case 'unless': {
+              const firstCondition = statement.params[0];
+              this.buffer.push(
+                `<sly data-sly-test="\${ ${
+                  (<hbs.AST.PathExpression>firstCondition).original
+                } == 'false' }">`,
+              );
+              const t = new HtlTranspiler(null, this.context, this.depth);
+
+              this.buffer.push(t.parseProgram(statement.program).toString());
+
+              this.buffer.push(`</sly>`);
+
+              break;
+            }
+
+            case 'is': {
+              const firstCondition = statement.params[0];
+              const secondCondition = statement.params[1];
+              this.buffer.push(
+                `<sly data-sly-test="\${ ${(<hbs.AST.PathExpression>firstCondition).original} == ${
+                  (<hbs.AST.PathExpression>secondCondition).original
+                } }">`,
+              );
+              const t = new HtlTranspiler(null, this.context, this.depth);
+
+              this.buffer.push(t.parseProgram(statement.program).toString());
+
+              this.buffer.push(`</sly>`);
+
+              break;
+            }
+
+            case 'with': {
+              const condition = statement.params[0];
+              this.buffer.push(
+                `<sly data-sly-test="\${ ${(<hbs.AST.PathExpression>condition).original} }">`,
+              );
+              const t = new HtlTranspiler(null, this.context, this.depth);
+
+              this.buffer.push(t.parseProgram(statement.program).toString());
+
+              this.buffer.push('</sly>');
+
+              break;
+            }
+
+            case 'gt': {
+              const firstCondition = statement.params[0];
+              const secondCondition = statement.params[1];
+              this.buffer.push(
+                `<sly data-sly-test="\${ ${
+                  (<hbs.AST.PathExpression>firstCondition).original
+                } &gt; ${(<hbs.AST.PathExpression>secondCondition).original} }">`,
+              );
+              const t = new HtlTranspiler(null, this.context, this.depth);
+
+              this.buffer.push(t.parseProgram(statement.program).toString());
+
+              this.buffer.push('</sly>');
 
               break;
             }
@@ -274,9 +335,9 @@ export class HtlTranspiler implements ITranspiler {
                 .map((pair: hbs.AST.HashPair) => {
                   const key = `${pair.key}=`;
                   if (pair.value.type === 'PathExpression') {
-                    return `${key}${this.context.getScopedVariable(
-                      <hbs.AST.PathExpression>pair.value,
-                    )}`;
+                    return `${key}${this.context.getScopedVariable(<hbs.AST.PathExpression>(
+                      pair.value
+                    ))}`;
                   }
                   if (pair.value.type === 'StringLiteral') {
                     return `${key}'${(<hbs.AST.StringLiteral>pair.value).value}'`;
